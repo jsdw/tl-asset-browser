@@ -1,0 +1,33 @@
+{
+  "name": "elm-tl-browser",
+  "version": "1.0.0",
+  "description": "Having a play with a Store oriented Elm architecture",
+  "main": "index.html",
+  "scripts": {
+    "build:elm": "elm make src/elm/Main.elm --output app.js",
+    "build:scss": "node-sass --output-style compressed src/scss/app.scss app.css",
+    "build": "npm run build:elm & npm run build:scss",
+    "clean": "rm app.js app.css",
+    "watch:scss": "onchange 'src/scss/**/*' -- npm run build:scss",
+    "watch:elm": "onchange 'src/elm/**/*' -- npm run build:elm",
+    "watch": "npm run watch:scss & npm run watch:elm"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jsdw/elm-tl-browser.git"
+  },
+  "keywords": [
+    "Elm"
+  ],
+  "author": "James Wilson",
+  "license": "BSD3",
+  "bugs": {
+    "url": "https://github.com/jsdw/elm-tl-browser/issues"
+  },
+  "homepage": "https://github.com/jsdw/elm-tl-browser",
+  "devDependencies": {
+    "autoprefixer": "^6.3.6",
+    "node-sass": "^3.4.2",
+    "onchange": "^2.4.0"
+  }
+}
