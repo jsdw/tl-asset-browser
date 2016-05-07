@@ -6947,73 +6947,897 @@ var _elm_lang$html$Html_App$beginnerProgram = function (_p1) {
 };
 var _elm_lang$html$Html_App$map = _elm_lang$virtual_dom$VirtualDom$map;
 
-var _user$project$Store$onSelfMsg = F3(
-	function (router, dimensions, state) {
-		return _elm_lang$core$Task$succeed(state);
+var _elm_lang$html$Html_Attributes$attribute = _elm_lang$virtual_dom$VirtualDom$attribute;
+var _elm_lang$html$Html_Attributes$contextmenu = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$attribute, 'contextmenu', value);
+};
+var _elm_lang$html$Html_Attributes$property = _elm_lang$virtual_dom$VirtualDom$property;
+var _elm_lang$html$Html_Attributes$stringProperty = F2(
+	function (name, string) {
+		return A2(
+			_elm_lang$html$Html_Attributes$property,
+			name,
+			_elm_lang$core$Json_Encode$string(string));
 	});
-var _user$project$Store$onEffects = F4(
-	function (router, newCmds, newSubs, oldState) {
+var _elm_lang$html$Html_Attributes$class = function (name) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'className', name);
+};
+var _elm_lang$html$Html_Attributes$id = function (name) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'id', name);
+};
+var _elm_lang$html$Html_Attributes$title = function (name) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'title', name);
+};
+var _elm_lang$html$Html_Attributes$accesskey = function ($char) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'accessKey',
+		_elm_lang$core$String$fromChar($char));
+};
+var _elm_lang$html$Html_Attributes$dir = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'dir', value);
+};
+var _elm_lang$html$Html_Attributes$draggable = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'draggable', value);
+};
+var _elm_lang$html$Html_Attributes$dropzone = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'dropzone', value);
+};
+var _elm_lang$html$Html_Attributes$itemprop = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'itemprop', value);
+};
+var _elm_lang$html$Html_Attributes$lang = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'lang', value);
+};
+var _elm_lang$html$Html_Attributes$tabindex = function (n) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'tabIndex',
+		_elm_lang$core$Basics$toString(n));
+};
+var _elm_lang$html$Html_Attributes$charset = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'charset', value);
+};
+var _elm_lang$html$Html_Attributes$content = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'content', value);
+};
+var _elm_lang$html$Html_Attributes$httpEquiv = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'httpEquiv', value);
+};
+var _elm_lang$html$Html_Attributes$language = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'language', value);
+};
+var _elm_lang$html$Html_Attributes$src = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'src', value);
+};
+var _elm_lang$html$Html_Attributes$height = function (value) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'height',
+		_elm_lang$core$Basics$toString(value));
+};
+var _elm_lang$html$Html_Attributes$width = function (value) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'width',
+		_elm_lang$core$Basics$toString(value));
+};
+var _elm_lang$html$Html_Attributes$alt = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'alt', value);
+};
+var _elm_lang$html$Html_Attributes$preload = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'preload', value);
+};
+var _elm_lang$html$Html_Attributes$poster = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'poster', value);
+};
+var _elm_lang$html$Html_Attributes$kind = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'kind', value);
+};
+var _elm_lang$html$Html_Attributes$srclang = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'srclang', value);
+};
+var _elm_lang$html$Html_Attributes$sandbox = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'sandbox', value);
+};
+var _elm_lang$html$Html_Attributes$srcdoc = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'srcdoc', value);
+};
+var _elm_lang$html$Html_Attributes$type$ = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'type', value);
+};
+var _elm_lang$html$Html_Attributes$value = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'value', value);
+};
+var _elm_lang$html$Html_Attributes$placeholder = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'placeholder', value);
+};
+var _elm_lang$html$Html_Attributes$accept = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'accept', value);
+};
+var _elm_lang$html$Html_Attributes$acceptCharset = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'acceptCharset', value);
+};
+var _elm_lang$html$Html_Attributes$action = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'action', value);
+};
+var _elm_lang$html$Html_Attributes$autocomplete = function (bool) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'autocomplete',
+		bool ? 'on' : 'off');
+};
+var _elm_lang$html$Html_Attributes$autosave = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'autosave', value);
+};
+var _elm_lang$html$Html_Attributes$enctype = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'enctype', value);
+};
+var _elm_lang$html$Html_Attributes$formaction = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'formAction', value);
+};
+var _elm_lang$html$Html_Attributes$list = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'list', value);
+};
+var _elm_lang$html$Html_Attributes$minlength = function (n) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'minLength',
+		_elm_lang$core$Basics$toString(n));
+};
+var _elm_lang$html$Html_Attributes$maxlength = function (n) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'maxLength',
+		_elm_lang$core$Basics$toString(n));
+};
+var _elm_lang$html$Html_Attributes$method = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'method', value);
+};
+var _elm_lang$html$Html_Attributes$name = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'name', value);
+};
+var _elm_lang$html$Html_Attributes$pattern = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'pattern', value);
+};
+var _elm_lang$html$Html_Attributes$size = function (n) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'size',
+		_elm_lang$core$Basics$toString(n));
+};
+var _elm_lang$html$Html_Attributes$for = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'htmlFor', value);
+};
+var _elm_lang$html$Html_Attributes$form = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'form', value);
+};
+var _elm_lang$html$Html_Attributes$max = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'max', value);
+};
+var _elm_lang$html$Html_Attributes$min = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'min', value);
+};
+var _elm_lang$html$Html_Attributes$step = function (n) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'step', n);
+};
+var _elm_lang$html$Html_Attributes$cols = function (n) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'cols',
+		_elm_lang$core$Basics$toString(n));
+};
+var _elm_lang$html$Html_Attributes$rows = function (n) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'rows',
+		_elm_lang$core$Basics$toString(n));
+};
+var _elm_lang$html$Html_Attributes$wrap = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'wrap', value);
+};
+var _elm_lang$html$Html_Attributes$usemap = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'useMap', value);
+};
+var _elm_lang$html$Html_Attributes$shape = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'shape', value);
+};
+var _elm_lang$html$Html_Attributes$coords = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'coords', value);
+};
+var _elm_lang$html$Html_Attributes$challenge = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'challenge', value);
+};
+var _elm_lang$html$Html_Attributes$keytype = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'keytype', value);
+};
+var _elm_lang$html$Html_Attributes$align = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'align', value);
+};
+var _elm_lang$html$Html_Attributes$cite = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'cite', value);
+};
+var _elm_lang$html$Html_Attributes$href = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'href', value);
+};
+var _elm_lang$html$Html_Attributes$target = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'target', value);
+};
+var _elm_lang$html$Html_Attributes$downloadAs = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'download', value);
+};
+var _elm_lang$html$Html_Attributes$hreflang = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'hreflang', value);
+};
+var _elm_lang$html$Html_Attributes$media = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'media', value);
+};
+var _elm_lang$html$Html_Attributes$ping = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'ping', value);
+};
+var _elm_lang$html$Html_Attributes$rel = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'rel', value);
+};
+var _elm_lang$html$Html_Attributes$datetime = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'datetime', value);
+};
+var _elm_lang$html$Html_Attributes$pubdate = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'pubdate', value);
+};
+var _elm_lang$html$Html_Attributes$start = function (n) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'start',
+		_elm_lang$core$Basics$toString(n));
+};
+var _elm_lang$html$Html_Attributes$colspan = function (n) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'colSpan',
+		_elm_lang$core$Basics$toString(n));
+};
+var _elm_lang$html$Html_Attributes$headers = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'headers', value);
+};
+var _elm_lang$html$Html_Attributes$rowspan = function (n) {
+	return A2(
+		_elm_lang$html$Html_Attributes$stringProperty,
+		'rowSpan',
+		_elm_lang$core$Basics$toString(n));
+};
+var _elm_lang$html$Html_Attributes$scope = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'scope', value);
+};
+var _elm_lang$html$Html_Attributes$manifest = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'manifest', value);
+};
+var _elm_lang$html$Html_Attributes$boolProperty = F2(
+	function (name, bool) {
+		return A2(
+			_elm_lang$html$Html_Attributes$property,
+			name,
+			_elm_lang$core$Json_Encode$bool(bool));
+	});
+var _elm_lang$html$Html_Attributes$hidden = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'hidden', bool);
+};
+var _elm_lang$html$Html_Attributes$contenteditable = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'contentEditable', bool);
+};
+var _elm_lang$html$Html_Attributes$spellcheck = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'spellcheck', bool);
+};
+var _elm_lang$html$Html_Attributes$async = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'async', bool);
+};
+var _elm_lang$html$Html_Attributes$defer = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'defer', bool);
+};
+var _elm_lang$html$Html_Attributes$scoped = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'scoped', bool);
+};
+var _elm_lang$html$Html_Attributes$autoplay = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'autoplay', bool);
+};
+var _elm_lang$html$Html_Attributes$controls = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'controls', bool);
+};
+var _elm_lang$html$Html_Attributes$loop = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'loop', bool);
+};
+var _elm_lang$html$Html_Attributes$default = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'default', bool);
+};
+var _elm_lang$html$Html_Attributes$seamless = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'seamless', bool);
+};
+var _elm_lang$html$Html_Attributes$checked = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'checked', bool);
+};
+var _elm_lang$html$Html_Attributes$selected = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'selected', bool);
+};
+var _elm_lang$html$Html_Attributes$autofocus = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'autofocus', bool);
+};
+var _elm_lang$html$Html_Attributes$disabled = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'disabled', bool);
+};
+var _elm_lang$html$Html_Attributes$multiple = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'multiple', bool);
+};
+var _elm_lang$html$Html_Attributes$novalidate = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'noValidate', bool);
+};
+var _elm_lang$html$Html_Attributes$readonly = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'readOnly', bool);
+};
+var _elm_lang$html$Html_Attributes$required = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'required', bool);
+};
+var _elm_lang$html$Html_Attributes$ismap = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'isMap', value);
+};
+var _elm_lang$html$Html_Attributes$download = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'download', bool);
+};
+var _elm_lang$html$Html_Attributes$reversed = function (bool) {
+	return A2(_elm_lang$html$Html_Attributes$boolProperty, 'reversed', bool);
+};
+var _elm_lang$html$Html_Attributes$classList = function (list) {
+	return _elm_lang$html$Html_Attributes$class(
+		A2(
+			_elm_lang$core$String$join,
+			' ',
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Basics$fst,
+				A2(_elm_lang$core$List$filter, _elm_lang$core$Basics$snd, list))));
+};
+var _elm_lang$html$Html_Attributes$style = _elm_lang$virtual_dom$VirtualDom$style;
+
+var _elm_lang$html$Html_Events$keyCode = A2(_elm_lang$core$Json_Decode_ops[':='], 'keyCode', _elm_lang$core$Json_Decode$int);
+var _elm_lang$html$Html_Events$targetChecked = A2(
+	_elm_lang$core$Json_Decode$at,
+	_elm_lang$core$Native_List.fromArray(
+		['target', 'checked']),
+	_elm_lang$core$Json_Decode$bool);
+var _elm_lang$html$Html_Events$targetValue = A2(
+	_elm_lang$core$Json_Decode$at,
+	_elm_lang$core$Native_List.fromArray(
+		['target', 'value']),
+	_elm_lang$core$Json_Decode$string);
+var _elm_lang$html$Html_Events$defaultOptions = _elm_lang$virtual_dom$VirtualDom$defaultOptions;
+var _elm_lang$html$Html_Events$onWithOptions = _elm_lang$virtual_dom$VirtualDom$onWithOptions;
+var _elm_lang$html$Html_Events$on = _elm_lang$virtual_dom$VirtualDom$on;
+var _elm_lang$html$Html_Events$onFocus = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'focus',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onBlur = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'blur',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onSubmitOptions = _elm_lang$core$Native_Utils.update(
+	_elm_lang$html$Html_Events$defaultOptions,
+	{preventDefault: true});
+var _elm_lang$html$Html_Events$onSubmit = function (msg) {
+	return A3(
+		_elm_lang$html$Html_Events$onWithOptions,
+		'submit',
+		_elm_lang$html$Html_Events$onSubmitOptions,
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onCheck = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'change',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetChecked));
+};
+var _elm_lang$html$Html_Events$onInput = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'input',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetValue));
+};
+var _elm_lang$html$Html_Events$onMouseOut = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseout',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseOver = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseover',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseLeave = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseleave',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseEnter = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseenter',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseUp = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseup',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseDown = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mousedown',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onDoubleClick = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'dblclick',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onClick = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'click',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$Options = F2(
+	function (a, b) {
+		return {stopPropagation: a, preventDefault: b};
+	});
+
+var _user$project$Store_Users$runCommand = F2(
+	function (cmd, model) {
+		var _p0 = cmd;
+		switch (_p0.ctor) {
+			case 'UserDetails':
+				return _elm_lang$core$Task$succeed(
+					{
+						ctor: '_Tuple2',
+						_0: model,
+						_1: _elm_lang$core$Maybe$Just(
+							_p0._1(
+								{name: 'James', description: 'jam\'s user'}))
+					});
+			case 'Login':
+				return _elm_lang$core$Task$succeed(
+					{
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{currentId: 'abcde-12345'}),
+						_1: _elm_lang$core$Maybe$Nothing
+					});
+			default:
+				return _elm_lang$core$Task$succeed(
+					{
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{currentId: ''}),
+						_1: _elm_lang$core$Maybe$Nothing
+					});
+		}
+	});
+var _user$project$Store_Users$runSubscription = F2(
+	function (sub, model) {
+		var _p1 = sub;
+		if (_p1.ctor === 'CurrentUser') {
+			return _elm_lang$core$Task$succeed(
+				{
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _elm_lang$core$Maybe$Just(
+						_p1._0(_elm_lang$core$Maybe$Nothing))
+				});
+		} else {
+			return _elm_lang$core$Task$succeed(
+				{
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _elm_lang$core$Maybe$Just(
+						_p1._0(
+							_elm_lang$core$Native_Utils.cmp(
+								_elm_lang$core$String$length(model.currentId),
+								0) > 0))
+				});
+		}
+	});
+var _user$project$Store_Users$init = _elm_lang$core$Task$succeed(
+	{userCache: _elm_lang$core$Dict$empty, currentId: ''});
+var _user$project$Store_Users$User = F2(
+	function (a, b) {
+		return {name: a, description: b};
+	});
+var _user$project$Store_Users$Model = F2(
+	function (a, b) {
+		return {userCache: a, currentId: b};
+	});
+var _user$project$Store_Users$IsAuthenticated = function (a) {
+	return {ctor: 'IsAuthenticated', _0: a};
+};
+var _user$project$Store_Users$CurrentUser = function (a) {
+	return {ctor: 'CurrentUser', _0: a};
+};
+var _user$project$Store_Users$subMap = F2(
+	function (func, sub) {
+		var _p2 = sub;
+		if (_p2.ctor === 'CurrentUser') {
+			return _user$project$Store_Users$CurrentUser(
+				function (_p3) {
+					return func(
+						_p2._0(_p3));
+				});
+		} else {
+			return _user$project$Store_Users$IsAuthenticated(
+				function (_p4) {
+					return func(
+						_p2._0(_p4));
+				});
+		}
+	});
+var _user$project$Store_Users$Logout = {ctor: 'Logout'};
+var _user$project$Store_Users$Login = F2(
+	function (a, b) {
+		return {ctor: 'Login', _0: a, _1: b};
+	});
+var _user$project$Store_Users$UserDetails = F2(
+	function (a, b) {
+		return {ctor: 'UserDetails', _0: a, _1: b};
+	});
+var _user$project$Store_Users$cmdMap = F2(
+	function (func, cmd) {
+		var _p5 = cmd;
+		switch (_p5.ctor) {
+			case 'UserDetails':
+				return A2(
+					_user$project$Store_Users$UserDetails,
+					_p5._0,
+					function (_p6) {
+						return func(
+							_p5._1(_p6));
+					});
+			case 'Login':
+				return A2(_user$project$Store_Users$Login, _p5._0, _p5._1);
+			default:
+				return _user$project$Store_Users$Logout;
+		}
+	});
+var _user$project$Store_Users$methods = F2(
+	function (command, subscription) {
+		return {
+			current: function (tagger) {
+				return subscription(
+					_user$project$Store_Users$CurrentUser(tagger));
+			},
+			isAuthenticated: function (tagger) {
+				return subscription(
+					_user$project$Store_Users$IsAuthenticated(tagger));
+			},
+			details: F2(
+				function (id, tagger) {
+					return command(
+						A2(_user$project$Store_Users$UserDetails, id, tagger));
+				}),
+			login: F2(
+				function (name, pass) {
+					return command(
+						A2(_user$project$Store_Users$Login, name, pass));
+				}),
+			logout: command(_user$project$Store_Users$Logout)
+		};
+	});
+
+var _user$project$Store$onSelfMsg = F3(
+	function (router, lark, state) {
 		return A2(
 			_elm_lang$core$Debug$log,
-			_elm_lang$core$Basics$toString(
-				{ctor: '_Tuple3', _0: newCmds, _1: newSubs, _2: oldState}),
-			_elm_lang$core$Task$succeed(oldState));
+			_elm_lang$core$Basics$toString(lark),
+			_elm_lang$core$Task$succeed(state));
 	});
-var _user$project$Store$cmdMap = F2(
-	function (func, cmd) {
-		return cmd;
+var _user$project$Store$onEffects = F4(
+	function (router, cmds, subs, state) {
+		var runCmd = F2(
+			function (cmd, model) {
+				var _p0 = cmd;
+				return A2(
+					_elm_lang$core$Task$andThen,
+					A2(_user$project$Store_Users$runCommand, _p0._0, model.users),
+					function (_p1) {
+						var _p2 = _p1;
+						return _elm_lang$core$Task$succeed(
+							{
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{users: _p2._0}),
+								_1: _p2._1
+							});
+					});
+			});
+		var runCmds = F2(
+			function (cmds, initialState) {
+				var step = F2(
+					function (cmd, task) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							A2(
+								_elm_lang$core$Task$andThen,
+								task,
+								runCmd(cmd)),
+							function (_p3) {
+								var _p4 = _p3;
+								var succ = _elm_lang$core$Task$succeed(_p4._0);
+								var _p5 = _p4._1;
+								if (_p5.ctor === 'Nothing') {
+									return succ;
+								} else {
+									return A2(
+										_elm_lang$core$Task$andThen,
+										A2(_elm_lang$core$Platform$sendToApp, router, _p5._0),
+										function (_p6) {
+											return succ;
+										});
+								}
+							});
+					});
+				return A3(
+					_elm_lang$core$List$foldl,
+					step,
+					_elm_lang$core$Task$succeed(initialState),
+					cmds);
+			});
+		var runSub = F2(
+			function (sub, model) {
+				var _p7 = sub;
+				return A2(
+					_elm_lang$core$Task$andThen,
+					A2(_user$project$Store_Users$runSubscription, _p7._0, model.users),
+					function (_p8) {
+						var _p9 = _p8;
+						return _elm_lang$core$Task$succeed(
+							{
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{users: _p9._0}),
+								_1: _p9._1
+							});
+					});
+			});
+		var runSubs = F2(
+			function (subs, initialState) {
+				var step = F2(
+					function (sub, task) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							A2(
+								_elm_lang$core$Task$andThen,
+								task,
+								runSub(sub)),
+							function (_p10) {
+								var _p11 = _p10;
+								var succ = _elm_lang$core$Task$succeed(_p11._0);
+								var _p12 = _p11._1;
+								if (_p12.ctor === 'Nothing') {
+									return succ;
+								} else {
+									return A2(
+										_elm_lang$core$Task$andThen,
+										A2(_elm_lang$core$Platform$sendToApp, router, _p12._0),
+										function (_p13) {
+											return succ;
+										});
+								}
+							});
+					});
+				return A3(
+					_elm_lang$core$List$foldl,
+					step,
+					_elm_lang$core$Task$succeed(initialState),
+					subs);
+			});
+		var _p14 = cmds;
+		if (_p14.ctor === '[]') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			return A2(
+				_elm_lang$core$Task$andThen,
+				A2(runCmds, cmds, state),
+				runSubs(subs));
+		}
 	});
-var _user$project$Store$subMap = F2(
-	function (func, sub) {
-		return sub;
+var _user$project$Store$init = A2(
+	_elm_lang$core$Task$andThen,
+	_user$project$Store_Users$init,
+	function (users) {
+		return _elm_lang$core$Task$succeed(
+			{users: users});
 	});
 var _user$project$Store$subscription = _elm_lang$core$Native_Platform.leaf('Store');
 var _user$project$Store$command = _elm_lang$core$Native_Platform.leaf('Store');
-var _user$project$Store$State = function (a) {
-	return {lark: a};
+var _user$project$Store$Model = function (a) {
+	return {users: a};
 };
-var _user$project$Store$init = _elm_lang$core$Task$succeed(
-	_user$project$Store$State(0));
-var _user$project$Store$SubscribeLark = function (a) {
-	return {ctor: 'SubscribeLark', _0: a};
+var _user$project$Store$UsersSub = function (a) {
+	return {ctor: 'UsersSub', _0: a};
 };
-var _user$project$Store$testSub = function (s) {
-	return _user$project$Store$subscription(
-		_user$project$Store$SubscribeLark(s));
+var _user$project$Store$subMap = F2(
+	function (func, sub) {
+		var _p15 = sub;
+		return _user$project$Store$UsersSub(
+			A2(_user$project$Store_Users$subMap, func, _p15._0));
+	});
+var _user$project$Store$UsersCmd = function (a) {
+	return {ctor: 'UsersCmd', _0: a};
 };
-var _user$project$Store$CommandLark = function (a) {
-	return {ctor: 'CommandLark', _0: a};
+var _user$project$Store$store = {
+	users: A2(
+		_user$project$Store_Users$methods,
+		function (_p16) {
+			return _user$project$Store$command(
+				_user$project$Store$UsersCmd(_p16));
+		},
+		function (_p17) {
+			return _user$project$Store$subscription(
+				_user$project$Store$UsersSub(_p17));
+		})
 };
-var _user$project$Store$testCmd = function (s) {
-	return _user$project$Store$command(
-		_user$project$Store$CommandLark(s));
-};
+var _user$project$Store$cmdMap = F2(
+	function (func, cmd) {
+		var _p18 = cmd;
+		return _user$project$Store$UsersCmd(
+			A2(_user$project$Store_Users$cmdMap, func, _p18._0));
+	});
 _elm_lang$core$Native_Platform.effectManagers['Store'] = {pkg: 'user/project', init: _user$project$Store$init, onEffects: _user$project$Store$onEffects, onSelfMsg: _user$project$Store$onSelfMsg, tag: 'fx', cmdMap: _user$project$Store$cmdMap, subMap: _user$project$Store$subMap};
 
 var _user$project$Main$update = F2(
-	function (m, a) {
-		return {
-			ctor: '_Tuple2',
-			_0: a,
-			_1: _user$project$Store$testCmd('cmdHi!')
+	function (msg, model) {
+		var noFx = function (a) {
+			return {ctor: '_Tuple2', _0: a, _1: _elm_lang$core$Platform_Cmd$none};
 		};
+		var _p0 = A2(_elm_lang$core$Debug$log, 'update', msg);
+		switch (_p0.ctor) {
+			case 'IsLoggedIn':
+				return noFx(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{isLoggedIn: _p0._0}));
+			case 'Username':
+				return noFx(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{username: _p0._0}));
+			case 'Password':
+				return noFx(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{password: _p0._0}));
+			case 'User':
+				return noFx(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{user: _p0._0}));
+			case 'Login':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(_user$project$Store$store.users.login, model.username, model.password)
+				};
+			default:
+				return {ctor: '_Tuple2', _0: model, _1: _user$project$Store$store.users.logout};
+		}
 	});
-var _user$project$Main$view = function (m) {
-	return _elm_lang$html$Html$text('hello');
+var _user$project$Main$model = {user: _elm_lang$core$Maybe$Nothing, isLoggedIn: false, username: '', password: ''};
+var _user$project$Main$Model = F4(
+	function (a, b, c, d) {
+		return {user: a, isLoggedIn: b, username: c, password: d};
+	});
+var _user$project$Main$Password = function (a) {
+	return {ctor: 'Password', _0: a};
 };
-var _user$project$Main$model = 0;
+var _user$project$Main$Username = function (a) {
+	return {ctor: 'Username', _0: a};
+};
+var _user$project$Main$Logout = {ctor: 'Logout'};
+var _user$project$Main$Login = {ctor: 'Login'};
+var _user$project$Main$view = function (m) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text(
+				m.isLoggedIn ? 'yes' : 'no'),
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text('Name'),
+						A2(
+						_elm_lang$html$Html$input,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Events$onInput(_user$project$Main$Username),
+								_elm_lang$html$Html_Attributes$value(m.username)
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[]))
+					])),
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$input,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Events$onInput(_user$project$Main$Password),
+								_elm_lang$html$Html_Attributes$value(m.password)
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[]))
+					])),
+				A2(
+				_elm_lang$html$Html$button,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Events$onClick(_user$project$Main$Login)
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text('Login')
+					])),
+				A2(
+				_elm_lang$html$Html$button,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Events$onClick(_user$project$Main$Logout)
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text('Logout')
+					]))
+			]));
+};
+var _user$project$Main$User = function (a) {
+	return {ctor: 'User', _0: a};
+};
+var _user$project$Main$IsLoggedIn = function (a) {
+	return {ctor: 'IsLoggedIn', _0: a};
+};
 var _user$project$Main$main = {
 	main: _elm_lang$html$Html_App$program(
 		{
 			init: {ctor: '_Tuple2', _0: _user$project$Main$model, _1: _elm_lang$core$Platform_Cmd$none},
 			update: _user$project$Main$update,
 			view: _user$project$Main$view,
-			subscriptions: function (_p0) {
-				return _user$project$Store$testSub('subHi2!');
+			subscriptions: function (model) {
+				return _elm_lang$core$Platform_Sub$batch(
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_user$project$Store$store.users.isAuthenticated(_user$project$Main$IsLoggedIn),
+							_user$project$Store$store.users.current(_user$project$Main$User)
+						]));
 			}
 		})
 };
-var _user$project$Main$NoOp = {ctor: 'NoOp'};
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};

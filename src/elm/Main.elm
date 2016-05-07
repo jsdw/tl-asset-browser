@@ -3,10 +3,11 @@ import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Html exposing (..)
 import Store exposing (store)
+import Store.Users as Users
 import String
 
 type alias Model =
-    { user : String
+    { user : Maybe Users.User
     , isLoggedIn : Bool
     , username : String
     , password : String
@@ -14,14 +15,14 @@ type alias Model =
 
 model : Model
 model =
-    { user = ""
+    { user = Nothing
     , isLoggedIn = False
     , username = ""
     , password = ""
     }
 
 type Msg = IsLoggedIn Bool
-         | User String
+         | User (Maybe Users.User)
          | Login
          | Logout
          | Username String
@@ -30,7 +31,7 @@ type Msg = IsLoggedIn Bool
 view : Model -> Html Msg
 view m =
     div [ ]
-        [ text <| if String.length m.user > 0 then m.user else "guest"
+        [ text <| if m.isLoggedIn then "yes" else "no"
         , div [] [ text "Name", input [ onInput Username, value m.username ] [] ]
         , div [] [ input [ onInput Password, value m.password ] [] ]
         , button [ onClick Login ] [ text "Login" ]
@@ -41,7 +42,7 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   let
     noFx a = (a, Cmd.none)
-  in case msg of
+  in case Debug.log "update" msg of
     IsLoggedIn b ->
         noFx { model | isLoggedIn = b }
     Username str ->
@@ -51,9 +52,9 @@ update msg model =
     User str ->
         noFx { model | user = str }
     Login ->
-        (model, store.login model.username model.password)
+        (model, store.users.login model.username model.password)
     Logout ->
-        (model, store.logout)
+        (model, store.users.logout)
 
 main : Program Never
 main =
@@ -62,8 +63,8 @@ main =
     , update = update
     , view = view
     , subscriptions = \model -> Sub.batch
-        [ store.authState IsLoggedIn
-        , store.currentUser User
+        [ store.users.isAuthenticated IsLoggedIn
+        , store.users.current User
         ]
     }
 
