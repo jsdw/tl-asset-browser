@@ -6,27 +6,18 @@ import Debug
 import Task exposing (Task, andThen)
 import List
 import String
+import Json.Encode exposing (Value)
 
-import Json
-
---
--- Encapsulate possible API repsonse outcomes:
---
--- TODO: Put API lark into a separate LowLevel module
---
-type Response = ResSuccess Success | ResError Error
-
-type alias Success = Json.Value
-type alias Error = String
+import Api.LowLevel as Api
 
 --
 -- What subscriptions do we have, and how does Sub.map apply to them.
 -- basically, how do we wrap the tagging function with another layer.
 --
 type MySub msg
-  = OnRequest  ((String, Json.Value) -> msg)
-  | OnResponse ((String, Json.Value, Success) -> msg)
-  | OnError    ((String, Json.Value, Error) -> msg)
+  = OnRequest  ((String, Value) -> msg)
+  | OnResponse ((String, Value, Success) -> msg)
+  | OnError    ((String, Value, Error) -> msg)
 
 subMap : (a -> b) -> MySub a -> MySub b
 subMap func sub = case sub of
@@ -37,7 +28,7 @@ subMap func sub = case sub of
 -- What commands do we have, and how does Cmd.map apply to them
 --
 type MyCmd msg
-  = Request String Json.Value
+  = Request String Value
 
 cmdMap : (a -> b) -> MyCmd a -> MyCmd b
 cmdMap func cmd = case cmd of
