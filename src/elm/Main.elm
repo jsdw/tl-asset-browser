@@ -12,12 +12,8 @@ type alias Model =
     { test : String
     }
 
-model : Model
-model =
-    { test = ""
-    }
 
-type Msg = Noop
+type Msg = Text String | Noop
 
 view : Model -> Html Msg
 view m =
@@ -28,10 +24,20 @@ view m =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model = (model, Cmd.none)
 
+init : (Model, Cmd Msg)
+init =
+  let
+    cmds = Cmd.batch
+        [ Api.setUrl "https://james.chorus.thirdlight.com"
+        , Api.request "core.getUserDetails" [] Nothing (Just <| \res -> Text (toString res))
+        ]
+  in
+    (Model "", cmds)
+
 main : Program Never
 main =
   Html.App.program
-    { init = ( model, Cmd.none )
+    { init = init
     , update = update
     , view = view
     , subscriptions = \model -> Sub.batch

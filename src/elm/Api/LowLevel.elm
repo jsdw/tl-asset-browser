@@ -85,8 +85,8 @@ request' (Session session) action data =
       let
         status = res.result
       in
-        if status.action /= "OK" then Task.fail (ActionError status.action res.debug)
-        else if status.api /= "OK" then Task.fail (ApiError status.api res.debug)
+        if status.api /= "OK" then Task.fail (ApiError status.api status.debug)
+        else if status.action /= "OK" then Task.fail (ActionError status.action status.debug)
         else Task.succeed (res.outParams, updateSession res)
     --
     -- Our request failed :( convert it into out ResponseError type
@@ -129,32 +129,38 @@ updateSession res (Session session) =
 type alias RawResult =
     { action : String
     , api    : String
+    , debug  : String
     }
 
 type alias RawResponse =
     { result    : RawResult
     , outParams : Maybe Json.Value
-    , debug     : String
     , sessionId : String
     }
 
 decodeResponse : Decoder RawResponse
 decodeResponse =
   let
-    rawResult = Decoder.object2 RawResult
+    rawResult = Decoder.object3 RawResult
         ("action" := Decoder.string)
         ("api"    := Decoder.string)
-    findSessionKey = Decoder.oneOf
+        ("debug"  :=? Decoder.string ?? "")
+    getSessionKey = Decoder.oneOf
         [ ("sessionId" := Decoder.string)
         , Decoder.at ["outParams", "sessionId"] Decoder.string
-        , Decoder.succeed ""
         ]
   in
-    Decoder.object4 RawResponse
+    Decoder.object3 RawResponse
         ("result"    := rawResult)
-        ("outParams" := Decoder.maybe Decoder.value)
-        ("debug"     := Decoder.oneOf [ Decoder.string, Decoder.succeed "" ])
-        ("sessionId" := findSessionKey)
+        ("outParams" :=? Decoder.maybe Decoder.value ?? Nothing)
+        ("sessionId" :=? getSessionKey ?? "")
+
+(:=?) str (decoder, default) =
+    Decoder.oneOf [ str := decoder, Decoder.succeed default ]
+infixl 5 :=?
+
+(??) a b = (a,b)
+infixl 6 ??
 
 --
 -- Helper funcs.
