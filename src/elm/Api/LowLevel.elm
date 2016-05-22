@@ -1,12 +1,24 @@
-module Api.LowLevel exposing (init, request, Session, Error(..), Success) --where
+module Api.LowLevel exposing --where
+    ( init
+    , setUrl
+    , getUrl
+    , isUrl
+    , request
+    , request'
+    , Session
+    , Params
+    , Error(..)
+    , Result
+    )
 
 import Http
+import String
 import Task exposing (Task)
 import Regex exposing (regex)
 import Json.Encode as Json
 import Json.Decode as Decoder exposing (Decoder, (:=))
 
-type alias Session =
+type Session = Session
     { url : String
     , key : String
     }
@@ -16,23 +28,48 @@ type Error
     | ApiError    String String
     | ShapeError  String
     | HttpError   Http.Error
+    | NoUrl
 
-type alias Success
+type alias Result
     = Maybe Json.Value
+
+type alias Params = List (String, Json.Value)
 
 --
 -- create a new API session:
 --
-init : String -> Session
-init url = Session (stripTrailingSlash url) ""
+init : Session
+init = Session { url = "", key = "" }
 
 --
--- Make an API request given a session, action and input params.
+-- Public interface to api session:
 --
-request : Session -> String -> List (String, Json.Value) -> Task Error (Success, Session)
+
+setUrl : String -> Session -> Session
+setUrl url (Session s) = Session { s | url = stripTrailingSlash url }
+
+getUrl : Session -> String
+getUrl (Session s) = s.url
+
+isUrl : Session -> Bool
+isUrl (Session s) = String.length s.url > 0
+
+--
+-- As below but return an updated session rather than a function
+-- to perform the updating.
+--
+request : Session -> String -> Params -> Task Error (Result, Session)
 request session action data =
+    request' session action data `Task.andThen` \(res,fn) -> Task.succeed (res,fn session)
+
+--
+-- Make an API request given a session, action and input params. return
+-- the response and a function to update a session based on it, or fail with the error
+--
+request' : Session -> String -> Params -> Task Error (Result, Session -> Session)
+request' (Session session) action data =
   let
-    reqUrl = session.url ++ "/api.json.tlx"
+
     reqBody = Json.encode 0 <| Json.object
         [ "action"     .= Json.string action
         , "inParams"   .= Json.object data
@@ -47,14 +84,10 @@ request session action data =
     handleSuccess res =
       let
         status = res.result
-        newKey = case (session.key, res.sessionId) of
-            ("", val) -> val
-            (val, "") -> val
-            (_, val) -> val
       in
         if status.action /= "OK" then Task.fail (ActionError status.action res.debug)
         else if status.api /= "OK" then Task.fail (ApiError status.api res.debug)
-        else Task.succeed (res.outParams, { session | key = newKey })
+        else Task.succeed (res.outParams, updateSession res)
     --
     -- Our request failed :( convert it into out ResponseError type
     -- and don't recover
@@ -62,10 +95,33 @@ request session action data =
     handleError err = case err of
         Http.UnexpectedPayload str -> Task.fail (ShapeError str)
         other -> Task.fail (HttpError other)
-  in
-    Http.post decodeResponse reqUrl (Http.string reqBody)
+
+    --
+    -- Make a request given a URL to make it to:
+    --
+    makeRequest url = Http.post decodeResponse url (Http.string reqBody)
         `Task.onError` handleError
         `Task.andThen` handleSuccess
+
+  in
+    case session.url of
+        ""  -> Task.fail NoUrl
+        url -> makeRequest (url ++ "/api.json.tlx")
+
+--
+-- Take a raw api result and a session and give back
+-- a new updated session as a result of it. used
+-- to update the session key from the response.
+--
+updateSession : RawResponse -> Session -> Session
+updateSession res (Session session) =
+  let
+    newKey = case (session.key, res.sessionId) of
+        ("", val) -> val
+        (val, "") -> val
+        (_, val) -> val
+  in
+    Session { session | key = newKey }
 
 --
 -- Decoding the API response into a basic structure:
