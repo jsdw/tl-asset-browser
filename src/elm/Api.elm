@@ -6,7 +6,6 @@ effect module Api where { command = MyCmd, subscription = MySub } exposing
   , setUrl
   )
 
-import Debug
 import Task exposing (Task, andThen)
 import List
 import Process exposing (spawn)
@@ -160,7 +159,7 @@ onSelfMsg router msg ({subs} as state) =
         doSend `Task.andThen` \_ -> Task.succeed newState
 
   in
-    case Debug.log "onSelfMsg" msg of
+    case msg of
         -- we've just made a request
         IsRequest  (action,params,onErr,onRes) ->
             sendTo (action,params) subs.onRequest state

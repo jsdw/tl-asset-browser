@@ -22,14 +22,18 @@ view m =
         ]
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update msg model = (model, Cmd.none)
+update msg model = case msg of
+    Noop -> (model, Cmd.none)
+    Text str -> Debug.log "update" ({model | test = str}, Cmd.none)
 
 init : (Model, Cmd Msg)
 init =
   let
     cmds = Cmd.batch
         [ Api.setUrl "https://james.chorus.thirdlight.com"
-        , Api.request "core.getUserDetails" [] Nothing (Just <| \res -> Text (toString res))
+        , Api.request "core.getUserDetails" []
+            (Just <| \res -> Text ("Err: " ++ toString res))
+            (Just <| \res -> Text ("Success: " ++ toString res))
         ]
   in
     (Model "", cmds)
