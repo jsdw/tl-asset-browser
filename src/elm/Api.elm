@@ -4,6 +4,10 @@ effect module Api where { command = MyCmd, subscription = MySub } exposing
   , onError
   , request
   , setUrl
+  -- re-export these:
+  , Params
+  , Result
+  , Error
   )
 
 import Task exposing (Task, andThen)
@@ -26,6 +30,9 @@ onError    callback = subscription <| OnError    callback
 request action params mErrFn mResFn = command <| Request action params mErrFn mResFn
 setUrl imsUrl = command <| SetUrl imsUrl
 
+type alias Params = Api.Params
+type alias Result = Api.Result
+type alias Error = Api.Error
 
 --
 -- What subscriptions do we have, and how does Sub.map apply to them.
