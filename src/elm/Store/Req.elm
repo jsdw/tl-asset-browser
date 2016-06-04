@@ -12,7 +12,7 @@ import Json.Decode as Json
 import Store.Api as Api
 
 type alias ApiResult =
-    { res : Api.Result
+    { res : Json.Value
     , startTime : Time
     , endTime : Time
     }
@@ -24,7 +24,9 @@ type alias ApiError =
     }
 
 type Req localMsg appMsg
-    = ApiRequest String Api.Params (ApiError -> Req localMsg appMsg) (ApiResult -> Req localMsg appMsg)
+    = ApiRequest String Api.Params
+        (ApiError -> Req localMsg appMsg)
+        (ApiResult -> Req localMsg appMsg)
     | DispatchToApp  appMsg
     | DispatchToSelf localMsg
     | NoReq
@@ -32,7 +34,9 @@ type Req localMsg appMsg
 reqMap : (a -> b) -> Req a appMsg -> Req b appMsg
 reqMap func req = case req of
     ApiRequest str params onErr onRes ->
-        ApiRequest str params (onErr >> reqMap func) (onRes >> reqMap func)
+        ApiRequest str params
+            (onErr >> reqMap func)
+            (onRes >> reqMap func)
     DispatchToSelf localMsg ->
         DispatchToSelf (func localMsg)
     DispatchToApp appMsg ->
@@ -53,7 +57,7 @@ runReq req toApp toLocal apiSess = case req of
       in
         Time.now
             `Task.andThen` \startTime ->
-        Task.toResult (Api.request apiSess action params)
+        Task.toResult (Api.request apiSess action params Json.value)
             `Task.andThen` \res ->
         Time.now
             `Task.andThen` \endTime -> case res of

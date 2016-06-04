@@ -15,10 +15,11 @@ import Store.Api as Api
 --
 store =
     { users =
-        { getDetails = \ids tagger -> command <| UserCmd (Users.AskForDetails ids tagger)
+        { current = \tagger -> command <| UserCmd (Users.AskCurrentUser tagger)
         , isAuthenticated = \tagger -> subscription <| UserSub (Users.IsAuthenticated tagger)
         }
     , setUrl = \string -> command <| SetUrl string
+    , onChange = \msg -> subscription <| OnChange msg
     }
 
 type MyCmd msg
@@ -31,10 +32,12 @@ cmdMap func cmd = case cmd of
     UserCmd cmd -> UserCmd <| Users.cmdMap func cmd
 
 type MySub msg
-    = UserSub (Users.UserSub msg)
+    = OnChange msg
+    | UserSub (Users.UserSub msg)
 
 subMap : (a -> b) -> MySub a -> MySub b
 subMap func mySub = case mySub of
+    OnChange msg -> OnChange (func msg)
     UserSub sub -> UserSub <| Users.subMap func sub
 
 type alias Model msg =
@@ -74,6 +77,8 @@ onSelfMsg router selfMsg model =
     runSubs = Task.sequence <| List.map (runSub >> spawn) model.subs
 
     runSub sub = case sub of
+        OnChange msg ->
+            toApp msg
         UserSub sub -> case Users.runSub sub model.users of
             Just msg -> toApp msg
             Nothing -> noop

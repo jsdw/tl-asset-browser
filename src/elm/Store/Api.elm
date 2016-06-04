@@ -8,7 +8,6 @@ module Store.Api exposing --where
     , Session
     , Params
     , Error(..)
-    , Result
     )
 
 import Http
@@ -31,9 +30,6 @@ type Error
     | ShapeError  String
     | HttpError   Http.Error
     | NoUrl
-
-type alias Result
-    = Maybe Json.Value
 
 type alias Params = List (String, Json.Value)
 
@@ -60,8 +56,8 @@ isUrl (Session s) = String.length s.url > 0
 -- Make an API request given a session, action and input params. return
 -- the response and a new session
 --
-request : Session -> String -> Params -> Task Error (Result, Session)
-request (Session session) action data =
+request : Session -> String -> Params -> Decoder res -> Task Error (res, Session)
+request (Session session) action data decoder =
   let
 
     reqBody = Json.encode 0 <| Json.object
@@ -78,10 +74,13 @@ request (Session session) action data =
     handleSuccess res =
       let
         status = res.result
+        decodeOutput outParams sess = case Decoder.decodeValue decoder outParams of
+            Err str -> Task.fail (ShapeError str)
+            Ok res -> Task.succeed (res, sess)
       in
         if status.api /= "OK" then Task.fail (ApiError status.api status.debug)
         else if status.action /= "OK" then Task.fail (ActionError status.action status.debug)
-        else updateSession res (Session session) `Task.andThen` \newSess -> Task.succeed (res.outParams, newSess)
+        else updateSession res (Session session) `Task.andThen` decodeOutput res.outParams
     --
     -- Our request failed :( convert it into out ResponseError type
     -- and don't recover
@@ -148,7 +147,7 @@ type alias RawResult =
 
 type alias RawResponse =
     { result    : RawResult
-    , outParams : Maybe Json.Value
+    , outParams : Json.Value
     , sessionId : String
     }
 
@@ -166,7 +165,7 @@ decodeResponse =
   in
     Decoder.object3 RawResponse
         ("result"    := rawResult)
-        ("outParams" :=? Decoder.maybe Decoder.value ?? Nothing)
+        ("outParams" :=? Decoder.value ?? Json.null)
         ("sessionId" :=? getSessionKey ?? "")
 
 
