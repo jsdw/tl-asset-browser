@@ -1,68 +1,108 @@
-module Store exposing --where
-  ( init
-  , update
-  , Msg(ApiResponse, ApiError)
-  )
+effect module Store where { command = MyCmd, subscription = MySub } exposing (store)
 
-import Api
-import Store.Users as Users exposing (Users)
+import Debug
+import Task exposing (Task, andThen)
+import List
+import String
+import Process exposing (spawn)
 
-type alias Store =
-    { users : Users
+import Store.Req as Req exposing (runReq, reqMap)
+import Store.Users as Users
+import Store.Api as Api
+
+--
+-- Registry of functions available from this:
+--
+store =
+    { users =
+        { getDetails = \ids tagger -> command <| UserCmd (Users.AskForDetails ids tagger)
+        , isAuthenticated = \tagger -> subscription <| UserSub (Users.IsAuthenticated tagger)
+        }
+    , setUrl = \string -> command <| SetUrl string
     }
 
-type Msg
-    -- public interface:
-    = ApiRequest  String Api.Params
-    | ApiResponse String Api.Params Api.Result
-    | ApiError    String Api.Params Api.Error
-    -- private interface:
-    | UserMsg     Users.Msg
+type MyCmd msg
+    = SetUrl String
+    | UserCmd (Users.UserCmd msg)
 
-update : Msg -> Store -> (Store, Cmd Msg)
-update msg store =
-  let
-    cmds userCmd = Cmd.batch
-        [ Cmd.map UserMsg userCmd
-        ]
-    newStore users =
-        { store
-        | users = users
-        }
-  in
-    case msg of
-    -- update individual stores given private messages
-    -- triggered from this update or init function:
-    UserMsg m ->
-        let (users,userCmd) = Users.update m store.users
-        in ({ store | users = users}, Cmd.map UserMsg userCmd)
-    -- update all stores given api message stuff:
-    ApiRequest a p ->
-      let
-        (users,userCmd) = Users.update (Users.ApiRequest a p) store.users
-      in
-        (newStore users, cmds userCmd)
-    ApiResponse a p r ->
-      let
-        (users,userCmd) = Users.update (Users.ApiResponse a p r) store.users
-      in
-        (newStore users, cmds userCmd)
-    ApiError a p e ->
-      let
-        (users,userCmd) = Users.update (Users.ApiError a p e) store.users
-      in
-        (newStore users, cmds userCmd)
+cmdMap : (a -> b) -> MyCmd a -> MyCmd b
+cmdMap func cmd = case cmd of
+    SetUrl str -> SetUrl str
+    UserCmd cmd -> UserCmd <| Users.cmdMap func cmd
 
+type MySub msg
+    = UserSub (Users.UserSub msg)
 
-init : (Store, Cmd Msg)
+subMap : (a -> b) -> MySub a -> MySub b
+subMap func mySub = case mySub of
+    UserSub sub -> UserSub <| Users.subMap func sub
+
+type alias Model msg =
+    { apiSession : Api.Session
+    , subs : List (MySub msg)
+    , users : Users.Model
+    }
+
+init : Task Never (Model msg)
 init =
+    Users.init `andThen` \users ->
+        Task.succeed
+            { apiSession = Api.init
+            , subs = []
+            , users = users
+            }
+
+-- update subs in model and route commands to onSelfMsg:
+onEffects : Platform.Router msg (SelfMsg msg) -> List (MyCmd msg) -> List (MySub msg) -> Model msg -> Task Never (Model msg)
+onEffects router cmds subs model =
+    (Task.sequence <| List.map (RunCmd >> Platform.sendToSelf router) cmds)
+        `endWith` { model | subs = subs }
+
+-- messages that can be sent to self:
+type SelfMsg msg
+    = FireSubs
+    | UpdateApiSess Api.Session
+    | RunCmd (MyCmd msg)
+
+-- handle SelfMsg's:
+onSelfMsg : Platform.Router msg (SelfMsg msg) -> SelfMsg msg -> Model msg -> Task Never (Model msg)
+onSelfMsg router selfMsg model =
   let
-    (users, userCmd) = Users.init
-    cmds = Cmd.batch
-        [ Cmd.map UserMsg userCmd
-        ]
-    store =
-        { users = users
-        }
+    toApp = Platform.sendToApp router
+    toSelf = Platform.sendToSelf router
+    noop = Task.succeed ()
+    runSubs = Task.sequence <| List.map (runSub >> spawn) model.subs
+
+    runSub sub = case sub of
+        UserSub sub -> case Users.runSub sub model.users of
+            Just msg -> toApp msg
+            Nothing -> noop
+
+    runCmd cmd = case cmd of
+        SetUrl str ->
+            Task.succeed { model | apiSession = Api.setUrl str model.apiSession }
+        UserCmd cmd ->
+            let (users, req) = Users.runCmd cmd model.users
+                newModel = { model | users = users}
+            in spawn (handleReq UserCmd req newModel) `endWith` newModel
+
+    handleReq tagger req model =
+        runSubs
+            `Task.andThen` \_ ->
+        runReq (reqMap tagger req) toApp (RunCmd >> toSelf) model.apiSession
+            `Task.andThen` \newApiSess ->
+        toSelf (UpdateApiSess newApiSess)
   in
-    (store,cmds)
+    case selfMsg of
+        UpdateApiSess sess ->
+            Task.succeed { model | apiSession = Api.mergeSessions [sess, model.apiSession] }
+        FireSubs ->
+            runSubs `endWith` model
+        RunCmd cmd ->
+            runCmd cmd
+                `Task.andThen` \model -> (toSelf FireSubs)
+                `Task.andThen` \_ -> Task.succeed model
+
+
+endWith : Task a b -> output -> Task a output
+endWith task output = Task.map (\_ -> output) task

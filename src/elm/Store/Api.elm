@@ -1,4 +1,4 @@
-module Api.LowLevel exposing --where
+module Store.Api exposing --where
     ( init
     , setUrl
     , getUrl
