@@ -32,6 +32,7 @@ init =
     cmds = Cmd.batch
         [ Api.setUrl "https://james.chorus.thirdlight.com"
         , Api.request "core.getUserDetails" []
+            (Just <| Text ("Req made"))
             (Just <| \res -> Text ("Err: " ++ toString res))
             (Just <| \res -> Text ("Success: " ++ toString res))
         ]

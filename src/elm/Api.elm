@@ -27,7 +27,7 @@ onRequest  callback = subscription <| OnRequest  callback
 onResponse callback = subscription <| OnResponse callback
 onError    callback = subscription <| OnError    callback
 
-request action params mErrFn mResFn = command <| Request action params mErrFn mResFn
+request action params mReqFn mErrFn mResFn = command <| Request action params mReqFn mErrFn mResFn
 setUrl imsUrl = command <| SetUrl imsUrl
 
 type alias Params = Api.Params
@@ -54,23 +54,27 @@ subMap func sub = case sub of
 -- What commands do we have, and how does Cmd.map apply to them
 --
 type MyCmd msg
-  = Request Action Api.Params (Maybe (Api.Error -> msg)) (Maybe (Api.Result -> msg))
+  = Request Action Api.Params
+      (Maybe msg)                 -- invoked when the request is made
+      (Maybe (Api.Error -> msg))  -- invoked if an error is returned
+      (Maybe (Api.Result -> msg)) -- invoked if a response is returned
   | SetUrl String
 
 cmdMap : (a -> b) -> MyCmd a -> MyCmd b
 cmdMap func cmd =
-  let
-    fn tagger = tagger >> func
-  in
     case cmd of
-        Request str json onErr onRes ->
-            Request str json (Maybe.map fn onErr) (Maybe.map fn onRes)
+        Request str json onReq onErr onRes ->
+            Request str json
+                (Maybe.map func onReq)
+                (Maybe.map (\tagger -> tagger >> func) onErr)
+                (Maybe.map (\tagger -> tagger >> func) onRes)
         SetUrl str -> SetUrl str
 
 --
 -- What internal state do we have.
 --
-type alias ApiRequest msg = (Action, Api.Params, Maybe (Api.Error -> msg), Maybe (Api.Result -> msg))
+type alias ApiRequest msg =
+    (Action, Api.Params, Maybe msg, Maybe (Api.Error -> msg), Maybe (Api.Result -> msg))
 type alias ApiRequests msg = List (ApiRequest msg)
 type alias Model msg =
     { session : Api.Session
@@ -123,9 +127,9 @@ onEffects router cmds subs model =
 makeRequests : Platform.Router msg (SelfMsg msg) -> Model msg -> Task Never ()
 makeRequests router {queuedReqs,session} =
   let
-    fn ((action,params,_,_) as ap) =
+    fn ((action,params,_,_,_) as ap) =
         (IsRequest ap |> Platform.sendToSelf router)
-            `Task.andThen` \_ -> Api.request' session action params
+            `Task.andThen` \_ -> Api.request session action params
             `Task.andThen` (IsResponse ap >> Platform.sendToSelf router)
             `Task.onError` (IsError    ap >> Platform.sendToSelf router)
             `Task.andThen` \_ -> Task.succeed ()
@@ -138,12 +142,12 @@ makeRequests router {queuedReqs,session} =
 --
 -- Handle the possible resulting output from makeRequests. This
 -- means firing off any subscriptions currently interested at each
--- stage of a request.
+-- stage of a request, and then any command responses.
 --
 
 type SelfMsg msg
     = IsRequest  (ApiRequest msg)
-    | IsResponse (ApiRequest msg) (Api.Result, Api.Session -> Api.Session)
+    | IsResponse (ApiRequest msg) (Api.Result, Api.Session)
     | IsError    (ApiRequest msg) Api.Error
 
 onSelfMsg : Platform.Router msg (SelfMsg msg) -> SelfMsg msg -> Model msg -> Task Never (Model msg)
@@ -157,10 +161,10 @@ onSelfMsg router msg ({subs} as state) =
 
     -- fire some data off to one maybe sub (if it's not Nothing)
     -- and return newState.
-    sendOneMaybe data mThisSub newState =
+    sendOneMaybe app mThisSub newState =
       let
         doSend = mThisSub
-            |> Maybe.map (\fn -> Platform.sendToApp router (fn data))
+            |> Maybe.map (\msg -> Platform.sendToApp router (app msg))
             |> Maybe.withDefault (Task.succeed ())
       in
         doSend `Task.andThen` \_ -> Task.succeed newState
@@ -168,16 +172,17 @@ onSelfMsg router msg ({subs} as state) =
   in
     case msg of
         -- we've just made a request
-        IsRequest  (action,params,onErr,onRes) ->
+        IsRequest  (action,params,onNow,onErr,onRes) ->
             sendTo (action,params) subs.onRequest state
+                `Task.andThen` sendOneMaybe (\fn -> fn) onNow
         -- we got a response but it was an error
-        IsError    (action,params,onErr,onRes) err ->
+        IsError    (action,params,onNow,onErr,onRes) err ->
             sendTo (action,params,err) subs.onError state
-                `Task.andThen` sendOneMaybe err onErr
+                `Task.andThen` sendOneMaybe (\fn -> fn err) onErr
         -- we got a successful response
-        IsResponse (action,params,onErr,onRes) (res, sessFn) ->
-            sendTo (action,params,res) subs.onResponse { state | session = sessFn state.session }
-                `Task.andThen` sendOneMaybe res onRes
+        IsResponse (action,params,onNow,onErr,onRes) (res, sess) ->
+            sendTo (action,params,res) subs.onResponse { state | session = Api.mergeSessions [sess,state.session] }
+                `Task.andThen` sendOneMaybe (\fn -> fn res) onRes
 
 --
 -- Take a list of commands and separate them out. We can group/remove dupes
@@ -195,8 +200,8 @@ compactCommands : List (MyCmd msg) -> GroupedCmds msg
 compactCommands cmds =
   let
     grouper cmd all = case cmd of
-        Request action params onErr onRes ->
-            { all | reqs = (action,params,onErr,onRes) :: all.reqs }
+        Request action params onReq onErr onRes ->
+            { all | reqs = (action,params,onReq,onErr,onRes) :: all.reqs }
         SetUrl url ->
             { all | url = Just url }
   in

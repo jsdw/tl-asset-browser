@@ -13,40 +13,45 @@ type alias Store =
 
 type Msg
     -- public interface:
-    = ApiResponse String Api.Params Api.Result
-    | String Api.Params Api.Error
+    = ApiRequest  String Api.Params
+    | ApiResponse String Api.Params Api.Result
+    | ApiError    String Api.Params Api.Error
     -- private interface:
     | UserMsg     Users.Msg
 
 update : Msg -> Store -> (Store, Cmd Msg)
-update msg store = case msg of
-    -- update individual stores given private messages:
+update msg store =
+  let
+    cmds userCmd = Cmd.batch
+        [ Cmd.map UserMsg userCmd
+        ]
+    newStore users =
+        { store
+        | users = users
+        }
+  in
+    case msg of
+    -- update individual stores given private messages
+    -- triggered from this update or init function:
     UserMsg m ->
         let (users,userCmd) = Users.update m store.users
         in ({ store | users = users}, Cmd.map UserMsg userCmd)
-    -- update all stores given api messages:
+    -- update all stores given api message stuff:
+    ApiRequest a p ->
+      let
+        (users,userCmd) = Users.update (Users.ApiRequest a p) store.users
+      in
+        (newStore users, cmds userCmd)
     ApiResponse a p r ->
       let
         (users,userCmd) = Users.update (Users.ApiResponse a p r) store.users
-        cmds = Cmd.batch
-            [ Cmd.map UserMsg userCmd
-            ]
-        newStore =
-            { users = users
-            }
       in
-        (newStore, cmds)
+        (newStore users, cmds userCmd)
     ApiError a p e ->
       let
         (users,userCmd) = Users.update (Users.ApiError a p e) store.users
-        cmds = Cmd.batch
-            [ Cmd.map UserMsg userCmd
-            ]
-        newStore =
-            { users = users
-            }
       in
-        (newStore, cmds)
+        (newStore users, cmds userCmd)
 
 
 init : (Store, Cmd Msg)

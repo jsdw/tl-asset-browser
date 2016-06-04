@@ -4,7 +4,7 @@ module Api.LowLevel exposing --where
     , getUrl
     , isUrl
     , request
-    , request'
+    , mergeSessions
     , Session
     , Params
     , Error(..)
@@ -13,6 +13,7 @@ module Api.LowLevel exposing --where
 
 import Http
 import String
+import Time exposing (Time)
 import Task exposing (Task)
 import Regex exposing (regex)
 import Json.Encode as Json
@@ -21,6 +22,7 @@ import Json.Decode as Decoder exposing (Decoder, (:=))
 type Session = Session
     { url : String
     , key : String
+    , time : Time
     }
 
 type Error
@@ -39,7 +41,7 @@ type alias Params = List (String, Json.Value)
 -- create a new API session:
 --
 init : Session
-init = Session { url = "", key = "" }
+init = Session { url = "", key = "", time = 0 }
 
 --
 -- Public interface to api session:
@@ -55,19 +57,11 @@ isUrl : Session -> Bool
 isUrl (Session s) = String.length s.url > 0
 
 --
--- As below but return an updated session rather than a function
--- to perform the updating.
+-- Make an API request given a session, action and input params. return
+-- the response and a new session
 --
 request : Session -> String -> Params -> Task Error (Result, Session)
-request session action data =
-    request' session action data `Task.andThen` \(res,fn) -> Task.succeed (res,fn session)
-
---
--- Make an API request given a session, action and input params. return
--- the response and a function to update a session based on it, or fail with the error
---
-request' : Session -> String -> Params -> Task Error (Result, Session -> Session)
-request' (Session session) action data =
+request (Session session) action data =
   let
 
     reqBody = Json.encode 0 <| Json.object
@@ -87,7 +81,7 @@ request' (Session session) action data =
       in
         if status.api /= "OK" then Task.fail (ApiError status.api status.debug)
         else if status.action /= "OK" then Task.fail (ActionError status.action status.debug)
-        else Task.succeed (res.outParams, updateSession res)
+        else updateSession res (Session session) `Task.andThen` \newSess -> Task.succeed (res.outParams, newSess)
     --
     -- Our request failed :( convert it into out ResponseError type
     -- and don't recover
@@ -109,19 +103,39 @@ request' (Session session) action data =
         url -> makeRequest (url ++ "/api.json.tlx")
 
 --
+-- Merge sessions
+--
+mergeSessions : List Session -> Session
+mergeSessions sessions =
+  let
+    (Session blankSess) = init
+    merger (Session sess) curr =
+        if curr.time > sess.time
+        then curr else
+            if String.length curr.key > String.length sess.key
+            then curr else sess
+  in
+    Session <| List.foldl merger blankSess sessions
+
+--
 -- Take a raw api result and a session and give back
 -- a new updated session as a result of it. used
 -- to update the session key from the response.
 --
-updateSession : RawResponse -> Session -> Session
+updateSession : RawResponse -> Session -> Task x Session
 updateSession res (Session session) =
   let
     newKey = case (session.key, res.sessionId) of
         ("", val) -> val
         (val, "") -> val
         (_, val) -> val
+    newSess time = Task.succeed <| Session
+        { session
+        | time = time
+        , key = newKey
+        }
   in
-    Session { session | key = newKey }
+    Time.now `Task.andThen` newSess
 
 --
 -- Decoding the API response into a basic structure:
@@ -155,16 +169,17 @@ decodeResponse =
         ("outParams" :=? Decoder.maybe Decoder.value ?? Nothing)
         ("sessionId" :=? getSessionKey ?? "")
 
+
+--
+-- Helper funcs.
+--
+
 (:=?) str (decoder, default) =
     Decoder.oneOf [ str := decoder, Decoder.succeed default ]
 infixl 5 :=?
 
 (??) a b = (a,b)
 infixl 6 ??
-
---
--- Helper funcs.
---
 
 stripTrailingSlash : String -> String
 stripTrailingSlash = Regex.replace (Regex.AtMost 1) (regex "/$") (\_ -> "")

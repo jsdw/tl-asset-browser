@@ -8,7 +8,8 @@ module Store.Users exposing --where
 import Api
 
 type Msg
-    = ApiResponse String Api.Params Api.Result
+    = ApiRequest  String Api.Params
+    | ApiResponse String Api.Params Api.Result
     | ApiError    String Api.Params Api.Error
 
 type alias Users =
