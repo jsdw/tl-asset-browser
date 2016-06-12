@@ -1,9 +1,16 @@
 module Store.Req exposing --where
   ( ApiResult
   , ApiError
-  , Req(..)
-  , reqMap
-  , runReq
+  , Req
+  , Params
+  , apiRequest
+  , toSelf
+  , toApp
+  , succeed
+  , andThen
+  , onError
+  , toTask
+  , none
   )
 
 import Time exposing (Time)
@@ -11,8 +18,8 @@ import Task exposing (Task)
 import Json.Decode as Json
 import Store.Api as Api
 
-type alias ApiResult =
-    { res : Json.Value
+type alias ApiResult res =
+    { res : res
     , startTime : Time
     , endTime : Time
     }
@@ -23,49 +30,57 @@ type alias ApiError =
     , endTime : Time
     }
 
-type Req localMsg appMsg
-    = ApiRequest String Api.Params
-        (ApiError -> Req localMsg appMsg)
-        (ApiResult -> Req localMsg appMsg)
-    | DispatchToApp  appMsg
-    | DispatchToSelf localMsg
-    | NoReq
+type alias Params localMsg appMsg =
+    { toApp : (appMsg -> Task Never ())
+    , toLocal : (localMsg -> Task Never ())
+    , sess : Api.Session
+    }
 
-reqMap : (a -> b) -> Req a appMsg -> Req b appMsg
-reqMap func req = case req of
-    ApiRequest str params onErr onRes ->
-        ApiRequest str params
-            (onErr >> reqMap func)
-            (onRes >> reqMap func)
-    DispatchToSelf localMsg ->
-        DispatchToSelf (func localMsg)
-    DispatchToApp appMsg ->
-        DispatchToApp appMsg
-    NoReq ->
-        NoReq
+type Req localMsg appMsg err out =
+    Req (Params localMsg appMsg -> Task err (out, Params localMsg appMsg))
 
-runReq : Req localMsg appMsg -> (appMsg -> Task Never ()) -> (localMsg -> Task Never ()) -> Api.Session -> Task Never Api.Session
-runReq req toApp toLocal apiSess = case req of
-    ApiRequest action params onErr onRes ->
-      let
-        handleSuccess startTime endTime (rawRes, newSess) =
-            let res = ApiResult rawRes startTime endTime
-            in runReq (onRes res) toApp toLocal newSess
-        handleError startTime endTime err =
-            let res = ApiError err startTime endTime
-            in runReq (onErr res) toApp toLocal apiSess
-      in
-        Time.now
-            `Task.andThen` \startTime ->
-        Task.toResult (Api.request apiSess action params Json.value)
-            `Task.andThen` \res ->
-        Time.now
-            `Task.andThen` \endTime -> case res of
-                Ok succ -> handleSuccess startTime endTime succ
-                Err err -> handleError startTime endTime err
-    DispatchToApp appMsg ->
-        toApp appMsg `Task.andThen` \_ -> Task.succeed apiSess
-    DispatchToSelf localMsg ->
-        toLocal localMsg `Task.andThen` \_ -> Task.succeed apiSess
-    NoReq ->
-        Task.succeed apiSess
+apiRequest : String -> Api.Params -> Json.Decoder res -> Req localMsg appMsg ApiError (ApiResult res)
+apiRequest action apiParams decoder =
+    Req <| \params -> Time.now
+        `Task.andThen` \startTime ->
+            Task.toResult (Api.request params.sess action apiParams decoder)
+        `Task.andThen` \res ->
+            Time.now
+        `Task.andThen` \endTime ->
+            case res of
+                Ok (res,sess) ->
+                    Task.succeed ((ApiResult res startTime endTime), { params | sess = sess})
+                Err err ->
+                    Task.fail (ApiError err startTime endTime)
+
+toSelf : localMsg -> Req localMsg appMsg Never ()
+toSelf msg = Req <| \params -> Task.map (\_ -> ((),params)) (params.toLocal msg)
+
+toApp : appMsg -> Req localMsg appMsg Never ()
+toApp msg = Req <| \params -> Task.map (\_ -> ((),params)) (params.toApp msg)
+
+--
+-- Standard utility bits (much like Task)
+--
+
+succeed : a -> Req localMsg appMsg x a
+succeed a = Req (\params -> Task.succeed (a,params))
+
+andThen : Req localMsg appMsg x a -> (a -> Req localMsg appMsg x b) -> Req localMsg appMsg x b
+andThen (Req reqfn) fn =
+  let newfn (res,params) = let (Req reqfn') = fn res in reqfn' params
+  in Req <| \params -> (reqfn params) `Task.andThen` newfn
+
+onError : Req localMsg appMsg a x -> (a -> Req localMsg appMsg b x) -> Req localMsg appMsg b x
+onError (Req reqfn) fn =
+  let newfn params err = let (Req reqfn') = fn err in reqfn' params
+  in Req <| \params -> (reqfn params) `Task.onError` newfn params
+
+toTask : Params localMsg appMsg -> Req localMsg appMsg x a -> Task x a
+toTask params (Req reqfn) = Task.map fst (reqfn params)
+
+none : Req localMsg appMsg x ()
+none = succeed ()
+
+
+
